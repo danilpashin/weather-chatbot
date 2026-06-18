@@ -12,7 +12,7 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-url = "http://127.0.0.1:8080/weather"
+url = f"http://{os.getenv("API_HOST")}:{os.getenv("API_PORT")}/weather"
 current_city = "Уфа"
 
 WAITING_CITY, CONFIRM_CITY = range(2)
