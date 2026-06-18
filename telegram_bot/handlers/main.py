@@ -2,7 +2,6 @@ import logging
 import requests
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import filters, MessageHandler, ApplicationBuilder, ContextTypes, CommandHandler, ConversationHandler
-from telegram.ext.filters import MessageFilter
 import os
 from packages.core.config import init_config
 
@@ -13,7 +12,7 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-url = "http://127.0.0.1:8080/storage"
+url = "http://127.0.0.1:8080/weather"
 current_city = "Уфа"
 
 WAITING_CITY, CONFIRM_CITY = range(2)
@@ -76,7 +75,6 @@ async def save_new_city(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
     return ConversationHandler.END
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    user = update.message.from_user
     await update.message.reply_text(
         "Пока! Пиши в любое время!", reply_markup=ReplyKeyboardRemove()
     )
