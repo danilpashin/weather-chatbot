@@ -65,6 +65,8 @@ async def change_city_confirm(update: Update, context: ContextTypes.DEFAULT_TYPE
     else:
         await menu(update, context)
 
+        return ConversationHandler.END
+
 async def save_new_city(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     global current_city
     current_city = update.message.text
