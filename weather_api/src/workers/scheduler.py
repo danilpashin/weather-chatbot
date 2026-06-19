@@ -5,6 +5,7 @@ import os
 import redis
 from packages.core.config import init_config
 from weather_api.src.domain.coord import Coord
+import logging
 
 init_config()
 
@@ -18,13 +19,25 @@ API_URLS={
     "Санкт-Петербург": f"https://api.openweathermap.org/data/2.5/weather?lat={dataSPB.lat}&lon={dataSPB.lon}&units=metric&lang=ru&APPID={os.getenv("API_TOKEN")}"
 }
 
-r = redis.asyncio.Redis(host=os.getenv("REDIS_WEATHER_HOST"), port=os.getenv("REDIS_WEATHER_PORT"), decode_responses=True)
+r_main = redis.asyncio.Redis(host=os.getenv("REDIS_WEATHER_HOST"), port=os.getenv("REDIS_WEATHER_PORT"), decode_responses=True)
+r_backup = redis.asyncio.Redis(host=os.getenv("REDIS_BACKUP_WEATHER_HOST"), port=os.getenv("REDIS_BACKUP_WEATHER_PORT"), decode_responses=True)
+
 interval_seconds = 10
 
-async def fetch_data(session, city, url):
+async def fetch_data(session: aiohttp.ClientSession, city, url):
     try:
         async with session.get(url) as response:
             data = await response.json()
+
+            if response.status != 200:
+                logging.error("Ошибка при запросе к API.")
+                logging.info("Попытка получить запасные данные...")
+                data = await r_backup.get(city)
+                if data is None:
+                    logging.error(f"Данные по городу {city} не найдены.")
+                    return False
+                await r_main.set(name=city, value=data)
+                return True
 
             payload = {
                 "temp": data["main"]["temp"], 
@@ -36,14 +49,16 @@ async def fetch_data(session, city, url):
 
             value = json.dumps(payload)
 
-            await r.set(name=city, value=value)
-            print(f"Данные по городу {city} успешно сохранены в Redis.")
-            return None
-    except Exception as e:
-        print(f"Ошибка при запросе к {url}: {e}")
-        return None         
+            await r_main.set(name=city, value=value)
+            await r_backup.set(name=city, value=value)
 
-async def background_api_worker():
+            logging.info(f"Данные по городу {city} успешно сохранены в Redis.")
+            return True
+    except Exception as e:
+        logging.error(f"Ошибка при запросе к {url}: {e}", exc_info=True)
+        return False
+
+async def weather_worker():
     while True:
         try:
             async with aiohttp.ClientSession() as session:
@@ -51,9 +66,13 @@ async def background_api_worker():
 
                 results = await asyncio.gather(*tasks)
 
-                print(f"[Воркер] Успешно обработано запросов: {len(results)}")
-        except Exception as e:
-            print(f"[КРИТИЧЕСКАЯ ОШИБКА ВОРКЕРА]: {e}")
+                successful_count = sum(results)
 
-        print(f"[Воркер] Засыпаем на {interval_seconds} секунд...")
+                logging.info(f"[Воркер] Всего задач запущено: {len(results)}")
+                logging.info(f"[Воркер] Успешно обработано запросов: {successful_count}")
+                logging.info(f"[Воркер] Ошибок: {len(results) - successful_count}")
+        except Exception as e:
+            logging.error(f"[КРИТИЧЕСКАЯ ОШИБКА ВОРКЕРА]: {e}")
+
+        logging.info(f"[Воркер] Засыпаем на {interval_seconds} секунд...")
         await asyncio.sleep(interval_seconds)

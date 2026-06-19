@@ -7,11 +7,28 @@ from weather_api.src.routers.weather import router, limiter
 from fastapi import FastAPI
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
+import queue
+import logging
+from logging.handlers import QueueHandler, QueueListener
+
+console_handler = logging.StreamHandler()
+formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
+console_handler.setFormatter(formatter)
+
+log_queue = queue.Queue()
+async_handler = QueueHandler(log_queue)
+
+root_logger = logging.getLogger()
+root_logger.setLevel(logging.INFO)
+root_logger.addHandler(async_handler)
+
+listener = QueueListener(log_queue, console_handler)
+listener.start()
 
 init_config()
 
 async def main_application():
-    worker_task = asyncio.create_task(scheduler.background_api_worker())
+    worker_task = asyncio.create_task(scheduler.weather_worker())
 
     app = FastAPI()
 
@@ -25,4 +42,7 @@ async def main_application():
     await server.serve()
 
 if __name__ == "__main__":
-    asyncio.run(main_application())
+    try:
+        asyncio.run(main_application())
+    finally:
+        listener.stop()
