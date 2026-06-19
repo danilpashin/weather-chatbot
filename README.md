@@ -47,6 +47,7 @@ pip install -r requirements.txt
 ```bash
 docker run --name redis-limiter -d -p 6379:6379 redis
 docker run --name redis-main-storage -d -p 6380:6379 redis
+docker run --name redis-backup-storage -d -p 6381:6379 redis
 ```
 
 ### 5. Запуск сервера с данными о погоде (uvicorn)
