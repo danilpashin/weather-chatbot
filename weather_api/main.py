@@ -2,7 +2,7 @@ import asyncio
 import uvicorn
 import os
 from packages.core.config import init_config
-import weather_api.src.workers.scheduler as scheduler
+import weather_api.src.workers.worker as worker
 from weather_api.src.routers.weather import router, limiter
 from fastapi import FastAPI
 from slowapi import _rate_limit_exceeded_handler
@@ -28,7 +28,7 @@ listener.start()
 init_config()
 
 async def main_application():
-    worker_task = asyncio.create_task(scheduler.weather_worker())
+    worker_task = asyncio.create_task(worker.weather_worker())
 
     app = FastAPI()
 
