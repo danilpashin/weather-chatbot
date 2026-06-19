@@ -64,3 +64,10 @@ python -m telegram_bot.handlers.main
 
 ### 7. Использование бота
 Бот запускается через команду `/start`
+
+
+## Демонстрация работы бота
+
+![Демо бота 1](docs/images/bot_demo_1.png)
+![Демо бота 2](docs/images/bot_demo_2.png)
+
