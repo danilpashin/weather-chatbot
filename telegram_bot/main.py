@@ -1,5 +1,7 @@
 import logging
 import requests
+import ollama
+from telegram_bot.src.llm.bot import parse_user_intent
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import filters, MessageHandler, ApplicationBuilder, ContextTypes, CommandHandler, ConversationHandler
 import os
@@ -31,7 +33,9 @@ async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE, text="Выб�
     await update.message.reply_text(
         text,
         reply_markup=ReplyKeyboardMarkup(
-            reply_keyboard, one_time_keyboard=True, resize_keyboard=True
+            reply_keyboard,
+            one_time_keyboard=True,
+            resize_keyboard=True,
         ),
     )
 
@@ -42,7 +46,9 @@ async def change_city_start(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     await update.message.reply_text(
         f"Текущий город: {current_city}. Хотите сменить его?",
         reply_markup=ReplyKeyboardMarkup(
-            reply_keyboard, one_time_keyboard=True, resize_keyboard=True
+            reply_keyboard,
+            one_time_keyboard=True,
+            resize_keyboard=True,
         ),
     )
 
@@ -57,7 +63,9 @@ async def change_city_confirm(update: Update, context: ContextTypes.DEFAULT_TYPE
             "Выберите город из списка:\n\n"
             "Уфа, Москва, Санкт-Петербург",
             reply_markup=ReplyKeyboardMarkup(
-                reply_keyboard, one_time_keyboard=True, resize_keyboard=True
+                reply_keyboard, 
+                one_time_keyboard=True, 
+                resize_keyboard=True,
             ),
         )
 
@@ -107,16 +115,23 @@ async def weather_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await menu(update, context)
 
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Извините, я не понимаю вашу команду")
-    await menu(update, context)
+    global current_city
+    json_data = await parse_user_intent(update.message.text)
+    if json_data["is_weather_request"]:
+        if json_data["city"] is not None:
+            current_city = json_data["city"]
+
+        await weather_all(update, context)
+    else:
+        await menu(update, context)
 
 
 if __name__ == '__main__':
     application = ApplicationBuilder().token(f'{os.getenv("TELEGRAM_BOT_TOKEN")}').build()
 
     start_handler = CommandHandler('start', start)
-    weather_handler = MessageHandler(filters.Text("Погода"), weather_all)
 
+    weather_handler = MessageHandler(filters.Text("Погода"), weather_all)
     change_city_conv = ConversationHandler(
         entry_points=[MessageHandler(filters.Text("Сменить город"), change_city_start)],
         states={
