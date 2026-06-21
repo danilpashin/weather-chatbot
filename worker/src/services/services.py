@@ -4,7 +4,7 @@ import json
 import aiohttp
 import os
 from packages.core.config import init_config
-from .api import fetch_data
+from ..clients.api import fetch_data
 
 init_config()
 

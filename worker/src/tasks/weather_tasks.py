@@ -3,7 +3,7 @@ import asyncio
 import os
 from packages.core.config import init_config
 from weather_api.src.domain.coord import Coord
-from .services import process_city_weather
+from ..services.services import process_city_weather
 import logging
 
 init_config()
