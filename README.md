@@ -50,19 +50,25 @@ docker run --name redis-main-storage -d -p 6380:6379 redis
 docker run --name redis-backup-storage -d -p 6381:6379 redis
 ```
 
-### 5. Запуск сервера с данными о погоде (uvicorn)
+### 5. Запуск фонового воркера
+В корневой папке проекта введите команду:
+```bash
+python -m worker.main
+```
+
+### 6. Запуск сервера с данными о погоде (uvicorn)
 В корневой папке проекта введите команду:
 ```bash
 python -m weather_api.main --reload
 ```
 
-### 6. Запуск бота
+### 7. Запуск бота
 В корневой папке проекта введите команду:
 ```bash
 python -m telegram_bot.handlers.main
 ```
 
-### 7. Использование бота
+### 8. Использование бота
 Бот запускается через команду `/start`
 
 
