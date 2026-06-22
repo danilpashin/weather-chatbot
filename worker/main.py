@@ -17,7 +17,7 @@ root_logger.addHandler(async_handler)
 listener = QueueListener(log_queue, console_handler)
 listener.start()
 
-from .src.tasks.weather_tasks import weather_worker
+from worker.src.tasks.weather_tasks import weather_worker
 
 async def main_worker():
     await weather_worker()

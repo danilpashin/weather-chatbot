@@ -4,12 +4,12 @@ import json
 import aiohttp
 import os
 from packages.core.config import init_config
-from ..clients.api import fetch_data
+from worker.src.clients.api import fetch_data
 
 init_config()
 
-r_main = redis.asyncio.Redis(host=os.getenv("REDIS_WEATHER_HOST"), port=os.getenv("REDIS_WEATHER_PORT"), decode_responses=True)
-r_backup = redis.asyncio.Redis(host=os.getenv("REDIS_BACKUP_WEATHER_HOST"), port=os.getenv("REDIS_BACKUP_WEATHER_PORT"), decode_responses=True)
+r_main = redis.asyncio.Redis(host=os.getenv("REDIS_WEATHER_HOST"), decode_responses=True)
+r_backup = redis.asyncio.Redis(host=os.getenv("REDIS_BACKUP_WEATHER_HOST"), decode_responses=True)
 
 async def process_city_weather(session: aiohttp.ClientSession, city: str, url: str) -> dict:
     payload = await fetch_data(session, url)

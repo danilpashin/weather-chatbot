@@ -7,7 +7,7 @@ from packages.core.config import init_config
 init_config()
 
 async def get_redis_data(city):
-    r = redis.asyncio.Redis(host=os.getenv("REDIS_WEATHER_HOST"), port=os.getenv("REDIS_WEATHER_PORT"), decode_responses=True)
+    r = redis.asyncio.Redis(host=os.getenv("REDIS_WEATHER_HOST"), decode_responses=True)
     try:
         raw_data = await r.get(city)
 

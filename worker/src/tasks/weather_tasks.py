@@ -18,7 +18,7 @@ cities_tasks = [
     {"city": "Санкт-Петербург", "url": f"https://api.openweathermap.org/data/2.5/weather?lat={dataSPB.lat}&lon={dataSPB.lon}&units=metric&lang=ru&APPID={os.getenv("API_TOKEN")}"}
 ]
 
-interval_seconds = 10
+interval_seconds = int(os.getenv("INTERVAL_SECONDS"))
 
 async def weather_worker():
     async with aiohttp.ClientSession() as session:
