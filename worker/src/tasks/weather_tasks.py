@@ -21,9 +21,9 @@ cities_tasks = [
 interval_seconds = 10
 
 async def weather_worker():
-    while True:
-        try:
-            async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession() as session:
+        while True:
+            try:
                 tasks = [process_city_weather(session, task["city"], task["url"]) for task in cities_tasks]
 
                 results = await asyncio.gather(*tasks)
@@ -35,8 +35,8 @@ async def weather_worker():
                     logging.error(f"Данные не были получены для городов {failed_cities}.")
                 if backup_used:
                     logging.warning(f"Для городов {backup_used} были использованы бэкапы.")
-        except Exception as e:
-            logging.error(f"[КРИТИЧЕСКАЯ ОШИБКА ВОРКЕРА]: {e}")
+            except Exception as e:
+                logging.error(f"[КРИТИЧЕСКАЯ ОШИБКА ВОРКЕРА]: {e}", exc_info=True)
 
-        logging.info(f"[Воркер] Засыпаем на {interval_seconds} секунд...")
-        await asyncio.sleep(interval_seconds)
+            logging.info(f"[Воркер] Засыпаем на {interval_seconds} секунд...")
+            await asyncio.sleep(interval_seconds)
