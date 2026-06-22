@@ -107,8 +107,9 @@ async def weather_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         ans = "\n".join(lines)
     else:
-        data = "Не удалось получить данные!\n\nПопробуйте ещё раз через некоторое время"
+        data = f"Не удалось получить данные для города {current_city}!\n\nПопробуйте ещё раз через некоторое время"
         ans = data
+        logging.info(f"[Бот] Ошибка при получении данных для города {current_city}. Код {response.status_code}")
     
     await context.bot.send_message(chat_id=update.effective_chat.id, text=ans)
 
