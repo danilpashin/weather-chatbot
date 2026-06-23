@@ -13,7 +13,7 @@ async def test_health(client):
 
 @pytest.mark.anyio
 async def test_get_weather_success(client):
-    with patch("weather_api.src.routers.weather.service.get_weather_data", new_callable=AsyncMock) as mock_get_weather:
+    with patch("weather_api.src.services.weather_service.WeatherService.get_weather_data", new_callable=AsyncMock) as mock_get_weather:
         mock_get_weather.return_value = Data(22.5, 21.9, "облачно с прояснениями", 3.5, 52)
 
         response = await client.get("/weather?name=Уфа")
@@ -45,8 +45,8 @@ async def test_get_weather_missing_name(client):
 
 @pytest.mark.anyio
 async def test_get_weather_city_not_found(client):
-    with patch("weather_api.src.routers.weather.service.get_weather_data", new_callable=AsyncMock) as mock_get_weather:
-        mock_get_weather.side_effect = CityNotFoundError("Город не найден")
+    with patch("weather_api.src.services.weather_service.WeatherService.get_weather_data", new_callable=AsyncMock) as mock_get_weather:
+        mock_get_weather.side_effect = CityNotFoundError("Москва")
 
         response = await client.get("/weather?name=Москва")
 
@@ -57,7 +57,7 @@ async def test_get_weather_city_not_found(client):
 
 @pytest.mark.anyio
 async def test_get_weather_internal_error(client):
-    with patch("weather_api.src.routers.weather.service.get_weather_data", new_callable=AsyncMock) as mock_get_weather:
+    with patch("weather_api.src.services.weather_service.WeatherService.get_weather_data", new_callable=AsyncMock) as mock_get_weather:
         mock_get_weather.side_effect = Exception("База данных не отвечает")
 
         response = await client.get("/weather?name=Уфа")
@@ -69,7 +69,7 @@ async def test_get_weather_internal_error(client):
 
 @pytest.mark.anyio
 async def test_get_weather_with_whitespace(client):
-    with patch("weather_api.src.routers.weather.service.get_weather_data", new_callable=AsyncMock) as mock_get_weather:
+    with patch("weather_api.src.services.weather_service.WeatherService.get_weather_data", new_callable=AsyncMock) as mock_get_weather:
         mock_get_weather.return_value = Data(10.0, 9.5, "ясно", 2.0, 60)
 
         response = await client.get("/weather?name=%20%20%20%20%20")
