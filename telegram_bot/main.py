@@ -1,7 +1,6 @@
 import logging
 import requests
-import ollama
-from telegram_bot.src.llm.bot import parse_user_intent
+from telegram_bot.src.text_analyzer.intent import parse_intent
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import filters, MessageHandler, ApplicationBuilder, ContextTypes, CommandHandler, ConversationHandler
 import os
@@ -116,14 +115,14 @@ async def weather_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await menu(update, context)
 
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    global current_city
-    json_data = await parse_user_intent(update.message.text)
-    if json_data["is_weather_request"]:
-        if json_data["city"] is not None:
-            current_city = json_data["city"]
-
+    data = parse_intent(update.message.text)
+    if data.is_weather_request:
+        if data.city is not None:
+            global current_city
+            current_city = data.city
         await weather_all(update, context)
     else:
+        await update.message.reply_text("Извините, я не понимаю вашу команду.")
         await menu(update, context)
 
 

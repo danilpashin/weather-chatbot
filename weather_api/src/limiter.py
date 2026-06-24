@@ -5,7 +5,7 @@ import os
 
 init_config()
 
-redis_url = os.getenv("REDIS_LIMITER_URL", "redis://localhost:6379/0")
+redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
 limiter = Limiter(
     key_func=get_remote_address,

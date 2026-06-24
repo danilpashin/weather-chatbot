@@ -7,7 +7,7 @@ import logging
 
 class RedisStorage(WeatherStorage):
     def __init__(self, host: str = None, port: int = 6379):
-        self.host = host or os.getenv("REDIS_WEATHER_HOST", "localhost")
+        self.host = host or os.getenv("REDIS_HOST", "localhost")
         self.port = port
         self._client = None
 
