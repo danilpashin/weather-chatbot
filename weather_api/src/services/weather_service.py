@@ -1,6 +1,8 @@
 from weather_api.src.domain.data import Data
-from weather_api.src.repositories.base import WeatherStorage
+from weather_api.src.repositories.base import WeatherCache
 from weather_api.src.domain.exceptions import CityNotFoundError
+from packages.logging import logger
+
 
 def transform_weather_data(raw_data: dict) -> Data:
     return Data(
@@ -11,15 +13,18 @@ def transform_weather_data(raw_data: dict) -> Data:
         humidity=int(raw_data.get("humidity", 0))
     )
 
+
 class WeatherService:
-    def __init__(self, storage: WeatherStorage):
-        self.storage = storage
+    def __init__(self, cache: WeatherCache):
+        self.cache = cache
 
     async def get_weather_data(self, city: str) -> Data:
-        raw = await self.storage.get_weather(city)
+        logger.info(f"Попытка получить данные для города {city}")
+        raw = await self.cache.get_weather(city)
         if not raw:
+            logger.error(f"Город '{city}' не найден в кэше")
             raise CityNotFoundError(city)
         return transform_weather_data(raw)
 
     async def close(self):
-        await self.storage.close()
+        await self.cache.close()

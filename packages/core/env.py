@@ -1,8 +1,7 @@
-import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-def init_config():
+def init_env():
     current = Path(__file__).resolve()
     
     for parent in current.parents:

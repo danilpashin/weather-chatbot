@@ -1,5 +1,5 @@
-import logging
 import aiohttp
+from packages.logging import logger
 
 async def fetch_data(session: aiohttp.ClientSession, url):
     try:
@@ -7,7 +7,7 @@ async def fetch_data(session: aiohttp.ClientSession, url):
             data = await response.json()
 
             if response.status != 200:
-                logging.error("Ошибка при запросе к API.")
+                logger.error("Ошибка при запросе к API.")
                 return None
 
             payload = {
@@ -20,5 +20,5 @@ async def fetch_data(session: aiohttp.ClientSession, url):
 
             return payload
     except Exception as e:
-        logging.error(f"Ошибка при запросе к {url}: {e}", exc_info=True)
+        logger.error(f"Ошибка при запросе к {url}: {e}", exc_info=True)
         return None

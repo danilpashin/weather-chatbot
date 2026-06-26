@@ -1,31 +1,31 @@
-import logging
-import redis
 import json
 import aiohttp
-import os
-from packages.core.config import init_config
+from packages.logging import logger
+from packages.core.env import init_env
+from packages.cache import cache
 from worker.src.clients.api import fetch_data
+from worker.src.settings.config import CityTask
 
-init_config()
+init_env()
 
-r = redis.asyncio.Redis(host=os.getenv("REDIS_HOST"), decode_responses=True)
+async def process_city_weather(session: aiohttp.ClientSession, city_obj: CityTask) -> dict:
+    city = city_obj.city
 
-async def process_city_weather(session: aiohttp.ClientSession, city: str, url: str) -> dict:
-    payload = await fetch_data(session, url)
-
+    payload = await fetch_data(session, city_obj.url)
     if payload is not None:
         value = json.dumps(payload)
-        await r.set(name=city, value=value)
-        logging.info(f"Данные по городу {city} успешно сохранены в Redis.")
+        await cache.set(key=city, value=value, ex=900)
+        logger.info(f"✅ {city} — данные получены и сохранены")
         return {"city": city, "success": True, "source": "api"}
     
-    logging.warning(f"API недоступно для {city}. Попытка получить запасные данные...")
-    backup_data = await r.get(city)
+    logger.warning(f"⚠️ {city} — API недоступно, ищу кэш...")
+    cached = await cache.get(city)
 
-    if backup_data is None:
-        logging.error(f"Данные по городу {city} в бэкапе не найдены!")
+    if not cached:
+        logger.error(f"❌ {city} — API недоступно и кэш пуст!")
         return {"city": city, "success": False, "error": "no_data"}
     
-    await r.set(name=city, value=backup_data)
-    logging.info(f"Найдена резервная копия данных для {city}.")
+    await cache.set(key=city, value=cached, ttl=900)
+
+    logger.info(f"💾 {city} — данные восстановлены из кэша (TTL обновлен)")
     return {"city": city, "success": True, "source": "backup"}
