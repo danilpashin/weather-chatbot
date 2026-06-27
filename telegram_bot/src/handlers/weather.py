@@ -1,19 +1,29 @@
 import aiohttp
 import telegram_bot.src.settings.config as cfg
 
+from uuid import uuid4
 from telegram import Update
 from telegram.ext import ContextTypes, MessageHandler, filters
 from telegram_bot.src.handlers.menu import menu
 from packages.logging import logger
+from packages.logging.setup import trace_id_var, user_id_var
 
 
 async def weather_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     current_city = await context.bot_data.cache.get_current_city()
     current_url = f"{cfg.URL}?name={current_city}"
 
+    user_id = user_id_var.get()
+    trace_id = trace_id_var.get()
+
+    headers = {
+        "X-Trace-ID": trace_id,
+        "X-User-ID": user_id
+    }
+
     async with aiohttp.ClientSession() as session:
         try:
-            async with session.get(current_url) as response:
+            async with session.get(current_url, headers=headers) as response:
                 if response.status != 200:
                     error_text = await response.text()
                     logger.error(f"❌ Ошибка API {response.status}: {error_text}")
