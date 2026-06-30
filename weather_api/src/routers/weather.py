@@ -1,21 +1,26 @@
 from packages.logging import logger
 from fastapi import Query, APIRouter, Request, HTTPException, Depends
+from pyrate_limiter import Duration, Limiter, Rate
 from weather_api.src.domain.exceptions import CityNotFoundError
 from weather_api.src.services.weather_service import WeatherService
-from weather_api.src.settings.config import limiter
+from fastapi_limiter.depends import RateLimiter
 
 router = APIRouter()
 
 def get_weather_service() -> WeatherService:
     raise NotImplementedError("Use app.dependency_overrides in tests")
 
-@router.get("/health")
-@limiter.limit("1000/minute")
+@router.get(
+    "/health",
+    dependencies=[Depends(RateLimiter(limiter=Limiter(Rate(1000, Duration.MINUTE * 1))))]
+)
 async def health(request: Request):
     return {"status": "ok"}
 
-@router.get("/weather")
-@limiter.limit("100/minute")
+@router.get(
+    "/weather",
+    dependencies=[Depends(RateLimiter(limiter=Limiter(Rate(10, Duration.MINUTE * 1))))]
+)
 async def get_weather(
     request: Request,
     name: str = Query(default="", description="Название города"),
