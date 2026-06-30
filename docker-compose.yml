@@ -1,16 +1,88 @@
 services:
-  redis-db:
+  redis-master:
     image: redis:latest
-    container_name: redis-db
+    container_name: redis-master
+    ports:
+      - "6379:6379"
+    command: redis-server
+    networks:
+      redis-net:
+        ipv4_address: 172.55.0.10
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
+      interval: 5s
+      timeout: 3s
       retries: 5
-      start_period: 5s
-    restart: always
+
+  redis-replica:
+    image: redis:latest
+    container_name: redis-replica
     ports:
-      - "${REDIS_PORT}:6379"
+      - "6380:6379"
+    command: redis-server --replicaof 172.55.0.10 6379
+    networks:
+      redis-net:
+        ipv4_address: 172.55.0.11
+    depends_on:
+      redis-master:
+        condition: service_healthy
+
+  redis-sentinel-1:
+    image: redis:latest
+    container_name: redis-sentinel-1
+    ports:
+      - "26379:26379"
+    command: >
+      sh -c "echo 'port 26379' > sentinel.conf &&
+             echo 'sentinel resolve-hostnames yes' >> sentinel.conf &&
+             echo 'sentinel announce-hostnames yes' >> sentinel.conf &&
+             echo 'sentinel monitor mymaster 172.55.0.10 6379 2' >> sentinel.conf &&
+             echo 'sentinel down-after-milliseconds mymaster 5000' >> sentinel.conf &&
+             echo 'sentinel failover-timeout mymaster 10000' >> sentinel.conf &&
+             redis-server sentinel.conf --sentinel"
+    networks:
+      - redis-net
+    depends_on:
+      redis-master:
+        condition: service_healthy
+
+  redis-sentinel-2:
+    image: redis:latest
+    container_name: redis-sentinel-2
+    ports:
+      - "26380:26379"
+    command: >
+      sh -c "echo 'port 26379' > sentinel.conf &&
+             echo 'sentinel resolve-hostnames yes' >> sentinel.conf &&
+             echo 'sentinel announce-hostnames yes' >> sentinel.conf &&
+             echo 'sentinel monitor mymaster 172.55.0.10 6379 2' >> sentinel.conf &&
+             echo 'sentinel down-after-milliseconds mymaster 5000' >> sentinel.conf &&
+             echo 'sentinel failover-timeout mymaster 10000' >> sentinel.conf &&
+             redis-server sentinel.conf --sentinel"
+    networks:
+      - redis-net
+    depends_on:
+      redis-master:
+        condition: service_healthy
+
+  redis-sentinel-3:
+    image: redis:latest
+    container_name: redis-sentinel-3
+    ports:
+      - "26381:26379"
+    command: >
+      sh -c "echo 'port 26379' > sentinel.conf &&
+             echo 'sentinel resolve-hostnames yes' >> sentinel.conf &&
+             echo 'sentinel announce-hostnames yes' >> sentinel.conf &&
+             echo 'sentinel monitor mymaster 172.55.0.10 6379 2' >> sentinel.conf &&
+             echo 'sentinel down-after-milliseconds mymaster 5000' >> sentinel.conf &&
+             echo 'sentinel failover-timeout mymaster 10000' >> sentinel.conf &&
+             redis-server sentinel.conf --sentinel"
+    networks:
+      - redis-net
+    depends_on:
+      redis-master:
+        condition: service_healthy
 
   weather-api-service:
     container_name: weather-api-service
@@ -21,10 +93,15 @@ services:
       - SERVICE_NAME=weather-api
       - API_HOST=${API_HOST}
       - API_PORT=${API_PORT}
-      - REDIS_HOST=redis-db
-      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_SENTINELS=${REDIS_SENTINELS}
+      - REDIS_MASTER_NAME=${REDIS_MASTER_NAME}
+    networks:
+      - redis-net
     ports:
       - "${API_PORT}:${API_PORT}"
+    depends_on:
+      redis-master:
+        condition: service_healthy
     volumes:
       - app-logs:/app/logs
 
@@ -36,7 +113,10 @@ services:
     environment:
       - SERVICE_NAME=worker
       - API_TOKEN=${API_TOKEN}
-      - REDIS_HOST=redis-db
+      - REDIS_SENTINELS=${REDIS_SENTINELS}
+      - REDIS_MASTER_NAME=${REDIS_MASTER_NAME}
+    networks:
+      - redis-net
     restart: always
     labels:
       - autoheal=true
@@ -46,7 +126,7 @@ services:
       timeout: 5s
       retries: 3
     depends_on:
-      redis-db:
+      redis-master:
         condition: service_healthy
     volumes:
       - app-logs:/app/logs
@@ -62,6 +142,10 @@ services:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - API_HOST=weather-api-service
       - API_PORT=${API_PORT}
+      - REDIS_SENTINELS=${REDIS_SENTINELS}
+      - REDIS_MASTER_NAME=${REDIS_MASTER_NAME}
+    networks:
+      - redis-net
     depends_on:
       weather-api-service:
         condition: service_started
@@ -111,3 +195,10 @@ services:
 volumes:
   app-logs:
   worker_health:
+
+networks:
+  redis-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.55.0.0/16
