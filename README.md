@@ -9,21 +9,115 @@
 * 🤖 **Умный UI** — динамические клавиатуры, которые меняются в зависимости от контекста диалога, возможность вручную написать запрос (парсинг через mawo-pymorphy3).
 
 ## 🛠️ Технологический стек
-* 🐍 **Язык программирования:** Python (v3.12.10)
-* ⚡ **Веб-Фреймворк:** FastAPI (v0.138.2)
-* 🤖 **Библиотека бота:** python-telegram-bot (v22.8)
-* 🗄️ **База данных:** Redis (v8.8.0) 
-* 🌤️ **Погодный API:** OpenWeatherMap / или ваш вариант
-* 🐳 **Контейнеризация:** Docker, Docker Compose (v4.78.0)
-* 📓 **Морфологический анализатор:** mawo-pymorphy3 (v1.0.4)
-* 🧾 **Мониторинг:** Grafana (v11.0.0)
+### **Ядро & Веб**
+* 🐍 **Язык программирования:** Python (v3.12)
+* ⚡ **Веб-Фреймворк:** FastAPI (v0.138.2) - асинхронный веб-фреймворк.
+* 🤖 **Библиотека бота:** python-telegram-bot (v22.8) - интеграция с Telegram.
+### **Базы данных & Производительность**
+* 🗄️ **Кеш:** Redis Sentinel
+* 🧱 **Лимитер:** FastAPI-limiter (v0.2.0)
+### **Сервисы & Инструменты**
+* 🌤️ **Погодный API:** OpenWeatherMap API
+* 📓 **Морфологический анализатор:** mawo-pymorphy3 (v1.0.4) - анализ текста для бота.
+### **Инфраструктура & DevOps**
+* 🐳 **Контейнеризация:** Docker, Docker Compose, autoheal
+* 🔨**Отказоустойчивость:** autoheal - автоматический перезапуск упавших контейнеров.
+* 📈 **Мониторинг:** Grafana (v11.0.0)
 
 ## 🏗️ Архитектура проекта
 
+```
+weather-chatbot
+├─ docker-compose.yml
+├─ Dockerfile.bot
+├─ Dockerfile.weather-api
+├─ Dockerfile.worker
+├─ docs
+│  └─ images
+│     ├─ bot_demo_1.png
+│     └─ bot_demo_2.png
+├─ packages
+│  ├─ cache
+│  │  ├─ base.py
+│  │  ├─ redis.py
+│  │  └─ __init__.py
+│  ├─ core
+│  │  ├─ env.py
+│  │  └─ __init__.py
+│  ├─ logging
+│  │  ├─ setup.py
+│  │  └─ __init__.py
+│  └─ redis
+│     └─ redis_client.py
+├─ telegram_bot
+│  ├─ main.py
+│  ├─ src
+│  │  ├─ domain
+│  │  │  └─ parsed_data.py
+│  │  ├─ handlers
+│  │  │  ├─ city.py
+│  │  │  ├─ help.py
+│  │  │  ├─ menu.py
+│  │  │  ├─ start.py
+│  │  │  ├─ unknown.py
+│  │  │  ├─ weather.py
+│  │  │  └─ __init__.py
+│  │  ├─ settings
+│  │  │  └─ config.py
+│  │  └─ text_analyzer
+│  │     ├─ analyzer.py
+│  │     ├─ intent.py
+│  │     ├─ key_words.py
+│  │     └─ __init__.py
+│  └─ __init__.py
+├─ weather_api
+│  ├─ main.py
+│  ├─ src
+│  │  ├─ domain
+│  │  │  ├─ data.py
+│  │  │  └─ exceptions.py
+│  │  ├─ repositories
+│  │  │  ├─ base.py
+│  │  │  └─ __init__.py
+│  │  ├─ routers
+│  │  │  ├─ weather.py
+│  │  │  └─ __init__.py
+│  │  ├─ services
+│  │  │  ├─ weather_service.py
+│  │  │  └─ __init__.py
+│  │  └─ settings
+│  │     └─ config.py
+│  ├─ tests
+│  │  ├─ conftest.py
+│  │  ├─ test_weather.py
+│  │  └─ __init__.py
+│  └─ __init__.py
+├─ worker
+│  ├─ main.py
+│  ├─ src
+│  │  ├─ clients
+│  │  │  ├─ api.py
+│  │  │  └─ __init__.py
+│  │  ├─ services
+│  │  │  ├─ weather.py
+│  │  │  └─ __init__.py
+│  │  ├─ settings
+│  │  │  └─ config.py
+│  │  └─ tasks
+│  │     ├─ weather_tasks.py
+│  │     └─ __init__.py
+│  └─ __init__.py
+├─ promtail-config.yaml
+├─ README.md
+├─ requirements.txt
+├─ .env
+├─ .gitignore
+
+```
+
 * `telegram_bot` — бот-обработчик команд пользователя (управляет диалогом через кнопки, парсинг сообщений пользователя). Берет данные через сервер `weather_api`.
-* `weather_api` — эндпоинты, бизнес-логика, запросы к Redis.
-* `worker` — обращается к API и обновляет данные в Redis раз в определенное время. 
-* Redis — лимитер запросов, хранилище текущих данных о погоде, получает данные от фонового воркера.
+* `weather_api` — эндпоинты, бизнес-логика, запросы к кешу.
+* `worker` — обращается к API и обновляет данные в кеше раз в определенное время.
 
 ## 🚀 Быстрый запуск
 Приложение **полностью** контейнеризовано, для запуска на Windows необходим `Docker Desktop`.
@@ -58,4 +152,3 @@ docker compose -f docker-compose.yml up
 
 ![Демо бота 1](docs/images/bot_demo_1.png)
 ![Демо бота 2](docs/images/bot_demo_2.png)
-
