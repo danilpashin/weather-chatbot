@@ -36,9 +36,18 @@ services:
       - API_TOKEN=${API_TOKEN}
       - REDIS_HOST=redis-db
     restart: always
+    labels:
+      - autoheal=true
+    healthcheck:
+      test: ["CMD-SHELL", "[ -n \"$(find /tmp/worker_status -mmin -1)\" ]"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     depends_on:
       redis-db:
         condition: service_healthy
+    volumes:
+      - worker_health:/tmp/worker_status
 
   tg-bot:
     container_name: tg-bot
@@ -55,3 +64,15 @@ services:
         condition: service_started
       worker-service:
         condition: service_started
+  autoheal:
+    image: willfarrell/autoheal:latest
+    container_name: autoheal-monitor
+    restart: always
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=autoheal
+      - AUTOHEAL_INTERVAL=5
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  worker_health:

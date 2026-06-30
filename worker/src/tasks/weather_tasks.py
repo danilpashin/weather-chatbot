@@ -1,9 +1,12 @@
 import aiohttp
 import asyncio
+import time
 from worker.src.services.weather import process_city_weather
 from worker.src.settings.config import CITIES, DEFAULT_INTERVAL
 from packages.logging import logger
 
+
+HEALTH_FILE = "/tmp/worker_status/health.txt"
 
 async def weather_worker():
     async with aiohttp.ClientSession() as session:
@@ -20,6 +23,10 @@ async def weather_worker():
                     logger.error(f"Данные не были получены для городов {failed_cities}")
                 if backup_used:
                     logger.warning(f"Для городов {backup_used} были использованы бэкапы")
+
+                with open(HEALTH_FILE, "w") as f:
+                    f.write(str(time.time()))
+                    f.flush()
             except Exception as e:
                 logger.error(f"[КРИТИЧЕСКАЯ ОШИБКА ВОРКЕРА]: {e}", exc_info=True)
 
