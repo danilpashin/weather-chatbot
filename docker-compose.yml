@@ -84,8 +84,8 @@ services:
       redis-master:
         condition: service_healthy
 
-  weather-api-service:
-    container_name: weather-api-service
+  weather-api:
+    container_name: weather-api
     build: 
       context: .
       dockerfile: Dockerfile.weather-api
@@ -105,8 +105,8 @@ services:
     volumes:
       - app-logs:/app/logs
 
-  worker-service:
-    container_name: worker-service
+  worker:
+    container_name: worker
     build:
       context: .
       dockerfile: Dockerfile.worker
@@ -140,16 +140,16 @@ services:
     environment:
       - SERVICE_NAME=bot
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
-      - API_HOST=weather-api-service
+      - API_HOST=weather-api
       - API_PORT=${API_PORT}
       - REDIS_SENTINELS=${REDIS_SENTINELS}
       - REDIS_MASTER_NAME=${REDIS_MASTER_NAME}
     networks:
       - redis-net
     depends_on:
-      weather-api-service:
+      weather-api:
         condition: service_started
-      worker-service:
+      worker:
         condition: service_started
     volumes:
       - app-logs:/app/logs
