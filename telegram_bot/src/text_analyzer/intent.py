@@ -20,5 +20,11 @@ def parse_intent(message) -> ParsedData:
                 if c.lower() == normal_form:
                     city = c
                     break
+                
+            if city is None:
+                for c in kw.CITIES_SHORT.keys():
+                    if c == normal_form:
+                        city = kw.CITIES_SHORT[c]
+                        break
 
     return ParsedData(is_weather_request, city)
