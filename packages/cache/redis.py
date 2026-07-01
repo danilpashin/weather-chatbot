@@ -13,53 +13,31 @@ class RedisCache(Cache):
         self._decode_responses = True
         self.client = RedisConnManager().get_master()
 
-    async def set(self, key: str, value: str | bytes, ex: int | None = None):
-        client = self.client
-        if ex:
-            await client.set(key, value, ex=ex)
-        else:
-            await client.set(key, value)
+    async def set(self, key, value, ex: int | None = None):
+        try:    
+            client = self.client
+            if ex:
+                await client.set(key, value, ex=ex)
+            else:
+                await client.set(key, value)
+        except Exception as e:
+            logger.error(f"Ошибка при записи данных: {e}")
 
-    async def get(self, key: str) -> str | None:
-        client = self.client
-        return await client.get(key)
-
-    async def get_weather(self, city: str) -> dict[str, Any] | None:
+    async def get(self, key) -> Any | None:
         try:
             client = self.client
-            raw = await client.get(city)
-            if not raw:
+            data = await client.get(key)
+            if data is None or data == "":
+                logger.debug(f"Ключ '{key}' не найден или пуст!")
                 return None
-            try:
-                return json.loads(raw)
-            except (json.JSONDecodeError, TypeError) as e:
-                logger.error(f"Ошибка при декодировании данных для города {city}: {e}")
-                return None
-        except Exception as e:
-            logger.error(f"Ошибка при получении данных о погоде для города {city}: {e}")
+            
+            return data
+        except json.JSONDecodeError as e:
+            logger.error(f"Ошибка парсинга в JSON при ключе '{key}': {e}")
             return None
-        
-    async def set_weather(self, city: str, value):
-        try:
-            client = self.client
-            await client.set(city, value)
         except Exception as e:
-            logger.error(f"Ошибка при записи данных о погоде для города {city}: {e}")
-
-    async def get_current_city(self) -> str | None:
-        client = self.client
-        current_city = await client.get('current_city')
-        if current_city:
-            return current_city
-        
-        return None
-
-    async def set_current_city(self, city):
-        try:
-            client = self.client
-            await client.set("current_city", city)
-        except Exception as e:
-            logger.error(f"Ошибка при установке текущего города: {e}")
+            logger.error(f"Ошибка при получении данных по ключу '{key}': {e}")
+            return None
     
     async def close(self):
         client = self.client

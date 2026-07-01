@@ -25,7 +25,7 @@ async def process_city_weather(session: aiohttp.ClientSession, city_obj: CityTas
         logger.error(f"❌ {city} — API недоступно и кэш пуст!")
         return {"city": city, "success": False, "error": "no_data"}
     
-    await cache.set(key=city, value=cached, ttl=900)
+    await cache.set(key=city, value=cached, ex=900)
 
     logger.info(f"💾 {city} — данные восстановлены из кэша (TTL обновлен)")
     return {"city": city, "success": True, "source": "backup"}

@@ -7,17 +7,9 @@ class Cache:
         pass
 
     @abc.abstractmethod
-    async def get_weather(self, city: str) -> dict[str, Any] | None:
+    async def get(self, key) -> Any | None:
         pass
 
     @abc.abstractmethod
-    async def set_weather(self, city: str, value):
-        pass
-
-    @abc.abstractmethod
-    async def get_current_city(self) -> str | None:
-        pass
-
-    @abc.abstractmethod
-    async def set_current_city(self, city):
+    async def set(self, key, value):
         pass

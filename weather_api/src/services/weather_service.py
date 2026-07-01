@@ -1,3 +1,4 @@
+import json
 from weather_api.src.domain.data import Data
 from weather_api.src.repositories.base import WeatherCache
 from weather_api.src.domain.exceptions import CityNotFoundError
@@ -20,11 +21,12 @@ class WeatherService:
 
     async def get_weather_data(self, city: str) -> Data:
         logger.info(f"Попытка получить данные для города {city}")
-        raw = await self.cache.get_weather(city)
-        if not raw:
+        data = await self.cache.get(city)
+        if not data:
             logger.error(f"Город '{city}' не найден в кэше")
             raise CityNotFoundError(city)
-        return transform_weather_data(raw)
+        json_data = json.loads(data)
+        return transform_weather_data(json_data)
 
     async def close(self):
         await self.cache.close()

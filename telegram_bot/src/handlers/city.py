@@ -9,7 +9,8 @@ WAITING_CITY, CONFIRM_CITY = range(2)
 
 
 async def change_city_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    current_city = await context.bot_data.cache.get_current_city()
+    user_id = update.message.from_user.id
+    current_city = await context.bot_data.cache.get(user_id)
     reply_keyboard = [["Да", "Нет"]]
     await update.message.reply_text(
         f"Текущий город: {current_city}. Хотите сменить его?",
@@ -46,11 +47,12 @@ async def change_city_confirm(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 
 async def save_new_city(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    user_id = update.message.from_user.id
     current_city = update.message.text
     if not current_city or current_city not in cfg.CITIES:
         await update.message.reply_text(f"⚠️ Город {current_city} не найден. Попробуйте снова.\n\n")
     else:
-        await context.bot_data.cache.set_current_city(current_city)
+        await context.bot_data.cache.set(user_id, current_city)
         await update.message.reply_text(f"Отлично, город сменён! Текущий город: {current_city}\n\n")
 
     await menu(update, context)
