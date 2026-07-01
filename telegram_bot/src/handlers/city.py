@@ -53,6 +53,7 @@ async def save_new_city(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
         await update.message.reply_text(f"⚠️ Город {current_city} не найден. Попробуйте снова.\n\n")
     else:
         await context.bot_data.cache.set(user_id, current_city)
+        await context.bot_data.db.set_user_data(user_id, current_city)
         await update.message.reply_text(f"Отлично, город сменён! Текущий город: {current_city}\n\n")
 
     await menu(update, context)

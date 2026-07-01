@@ -14,7 +14,8 @@
 * ⚡ **Веб-Фреймворк:** FastAPI (v0.138.2) - асинхронный веб-фреймворк.
 * 🤖 **Библиотека бота:** python-telegram-bot (v22.8) - интеграция с Telegram.
 ### **Базы данных & Производительность**
-* 🗄️ **Кеш:** Redis Sentinel
+* 🐘 **База данных:** PostgreSQL (v16-alpine)
+* 🗃️ **Кеш:** Redis Sentinel
 * 🧱 **Лимитер:** FastAPI-limiter (v0.2.0)
 ### **Сервисы & Инструменты**
 * 🌤️ **Погодный API:** OpenWeatherMap API
@@ -44,12 +45,24 @@ weather-chatbot
 │  ├─ core
 │  │  ├─ env.py
 │  │  └─ __init__.py
+│  ├─ db
+│  │  ├─ base.py
+│  │  ├─ postgres.py
+│  │  └─ __init__.py
 │  ├─ logging
 │  │  ├─ setup.py
 │  │  └─ __init__.py
 │  └─ redis
 │     └─ redis_client.py
 ├─ telegram_bot
+│  ├─ alembic
+│  │  ├─ env.py
+│  │  ├─ README
+│  │  ├─ script.py.mako
+│  │  └─ versions
+│  │     └─ 3e6292fdfb7e_create_users_table.py
+│  ├─ alembic-entrypoint.sh
+│  ├─ alembic.ini
 │  ├─ main.py
 │  ├─ src
 │  │  ├─ domain
@@ -62,6 +75,8 @@ weather-chatbot
 │  │  │  ├─ unknown.py
 │  │  │  ├─ weather.py
 │  │  │  └─ __init__.py
+│  │  ├─ services
+│  │  │  └─ user_service.py
 │  │  ├─ settings
 │  │  │  └─ config.py
 │  │  └─ text_analyzer

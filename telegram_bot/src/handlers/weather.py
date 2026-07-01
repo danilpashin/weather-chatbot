@@ -11,6 +11,10 @@ from packages.logging.setup import trace_id_var, user_id_var
 
 async def weather_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     current_city = await context.bot_data.cache.get(update.message.from_user.id)
+    if current_city is None:
+        current_city = await context.bot_data.db.get_user_data(update.message.from_user.id)
+        await context.bot_data.cache.set(update.message.from_user.id, current_city, 300)
+        
     current_url = f"{cfg.URL}?name={current_city}"
 
     user_id = user_id_var.get()
