@@ -15,11 +15,18 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    
     - name: Set up Python 3.12
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
         python-version: "3.12"
-    - name: Run Ruff
+
+    - name: Run Ruff Check
       uses: astral-sh/ruff-action@v3
       with:
-        args: "check && ruff format --check"
+        args: "check"
+
+    - name: Run Ruff Format
+      uses: astral-sh/ruff-action@v3
+      with:
+        args: "format --check"
