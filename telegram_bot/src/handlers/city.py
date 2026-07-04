@@ -31,11 +31,11 @@ async def change_city_confirm(update: Update, context: CustomContext) -> int:
     if reply == "Да":
         reply_keyboard = [cfg.CITIES]
         await update.message.reply_text(
-            "Выберите город из списка:\n\n"
+            "Выберите город из списка:\n\n"  # fmt: skip
             "Уфа, Москва, Санкт-Петербург",
             reply_markup=ReplyKeyboardMarkup(
-                reply_keyboard, 
-                one_time_keyboard=True, 
+                reply_keyboard,
+                one_time_keyboard=True,
                 resize_keyboard=True,
             ),
         )
@@ -51,11 +51,15 @@ async def save_new_city(update: Update, context: CustomContext) -> int:
     user_id = update.message.from_user.id
     current_city = update.message.text
     if not current_city or current_city not in cfg.CITIES:
-        await update.message.reply_text(f"⚠️ Город {current_city} не найден. Попробуйте снова.\n\n")
+        await update.message.reply_text(
+            f"⚠️ Город {current_city} не найден. Попробуйте снова.\n\n"
+        )
     else:
         await context.cache.set(user_id, current_city)
         await context.db.set_user_data(user_id, current_city)
-        await update.message.reply_text(f"Отлично, город сменён! Текущий город: {current_city}\n\n")
+        await update.message.reply_text(
+            f"Отлично, город сменён! Текущий город: {current_city}\n\n"
+        )
 
     await menu(update, context)
 
@@ -76,7 +80,9 @@ def create_city_handler():
     return ConversationHandler(
         entry_points=[MessageHandler(filters.Text("Сменить город"), change_city_start)],
         states={
-            CONFIRM_CITY: [MessageHandler(filters.Text(["Да", "Нет"]), change_city_confirm)],
+            CONFIRM_CITY: [
+                MessageHandler(filters.Text(["Да", "Нет"]), change_city_confirm)
+            ],
             WAITING_CITY: [MessageHandler(filters.Text(cfg.CITIES), save_new_city)],
         },
         fallbacks=[MessageHandler(filters.Text(["❌ Отмена", "Отмена"]), cancel)],

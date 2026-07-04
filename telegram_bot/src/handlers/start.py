@@ -12,7 +12,7 @@ async def start(update: Update, context: CustomContext):
 
     trace_id_var.set(trace_id)
     user_id_var.set(str(user_id))
-    
+
     current_city = await context.db.get_user_data(user_id)
     if current_city is None:
         await context.db.set_user_data(user_id, "Москва")
@@ -28,4 +28,4 @@ async def start(update: Update, context: CustomContext):
 
 
 def create_start_handler():
-    return CommandHandler('start', start)
+    return CommandHandler("start", start)

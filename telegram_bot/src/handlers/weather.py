@@ -14,7 +14,7 @@ async def weather_all(update: Update, context: CustomContext):
     if current_city is None:
         current_city = await context.db.get_user_data(update.message.from_user.id)
         await context.cache.set(update.message.from_user.id, current_city, 300)
-        
+
     current_url = f"{cfg.URL}?name={current_city}"
 
     user_id = user_id_var.get()
@@ -22,7 +22,7 @@ async def weather_all(update: Update, context: CustomContext):
 
     headers = {
         "X-Trace-ID": trace_id,
-        "X-User-ID": user_id
+        "X-User-ID": user_id,
     }
 
     async with aiohttp.ClientSession() as session:
@@ -33,28 +33,30 @@ async def weather_all(update: Update, context: CustomContext):
                     logger.error(f"❌ Ошибка API {response.status}: {error_text}")
                     await context.bot.send_message(
                         chat_id=update.effective_chat.id,
-                        text=f"❌ Ошибка API: {response.status}. Подробности в логах."
+                        text=f"❌ Ошибка API: {response.status}. Подробности в логах.",
                     )
                     return None
-                
+
                 data = await response.json()
                 logger.info(f"✅ {current_city} - Данные успешно получены")
                 lines = [
                     f"🌍 Прогноз погоды в городе {current_city}:",
                     "",
-                    f"🌡 Текущая температура: {data["temp"]}°C",
-                    f"🤔 По ощущениям: {data["feels_like"]}°C",
-                    f"💨 Ветер: {data["wind"]} м/с",
-                    f"☁️ На улице: {data["weather_desc"]}"
+                    f"🌡 Текущая температура: {data['temp']}°C",
+                    f"🤔 По ощущениям: {data['feels_like']}°C",
+                    f"💨 Ветер: {data['wind']} м/с",
+                    f"☁️ На улице: {data['weather_desc']}",
                 ]
 
                 ans = "\n".join(lines)
 
-                await context.bot.send_message(chat_id=update.effective_chat.id, text=ans)
+                await context.bot.send_message(
+                    chat_id=update.effective_chat.id, text=ans
+                )
         except Exception as e:
             logger.error(f"❌ Ошибка при запросе к {current_url}: {e}", exc_info=True)
             return None
-        
+
     await menu(update, context)
 
 

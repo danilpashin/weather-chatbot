@@ -1,28 +1,36 @@
 import aiohttp
 import asyncio
 import time
-from worker.src.services.weather import process_city_weather
-from worker.src.settings.config import CITIES, DEFAULT_INTERVAL
+from worker.src.services.weather_service import process_city_weather
+from worker.src.settings.config import DEFAULT_INTERVAL
+from worker.src.settings.city_tasks import CITY_TASKS
 from packages.logging import logger
 
 
 HEALTH_FILE = "/tmp/worker_status/health.txt"
 
+
 async def weather_worker():
     async with aiohttp.ClientSession() as session:
         while True:
             try:
-                tasks = [process_city_weather(session, city_obj) for city_obj in CITIES]
+                tasks = [
+                    process_city_weather(session, city_obj) for city_obj in CITY_TASKS
+                ]
 
                 results = await asyncio.gather(*tasks)
 
                 failed_cities = [res["city"] for res in results if not res["success"]]
-                backup_used = [res["city"] for res in results if res.get("source") == "backup"]
+                backup_used = [
+                    res["city"] for res in results if res.get("source") == "backup"
+                ]
 
                 if failed_cities:
                     logger.error(f"Данные не были получены для городов {failed_cities}")
                 if backup_used:
-                    logger.warning(f"Для городов {backup_used} были использованы бэкапы")
+                    logger.warning(
+                        f"Для городов {backup_used} были использованы бэкапы"
+                    )
 
                 with open(HEALTH_FILE, "w") as f:
                     f.write(str(time.time()))

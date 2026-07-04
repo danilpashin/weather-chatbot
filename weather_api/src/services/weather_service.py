@@ -11,7 +11,7 @@ def transform_weather_data(raw_data: dict) -> Data:
         feels_like=float(raw_data.get("feels_like", 0)),
         weather_desc=str(raw_data.get("weather_desc", "")),
         wind=float(raw_data.get("wind", 0)),
-        humidity=int(raw_data.get("humidity", 0))
+        humidity=int(raw_data.get("humidity", 0)),
     )
 
 

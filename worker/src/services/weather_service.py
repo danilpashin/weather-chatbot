@@ -4,7 +4,7 @@ from packages.logging import logger
 from packages.core.env import init_env
 from packages.cache import cache
 from worker.src.clients.api import fetch_data
-from worker.src.settings.config import CityTask
+from worker.src.models.city_task import CityTask
 
 init_env()
 

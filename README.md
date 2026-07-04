@@ -20,6 +20,7 @@
 ### **Сервисы & Инструменты**
 * 🌤️ **Погодный API:** OpenWeatherMap API
 * 📓 **Морфологический анализатор:** mawo-pymorphy3 (v1.0.4) - анализ текста для бота.
+* ✨ **Линтер:** Ruff - (v0.15.20) моментальный линтинг и форматирование кода.
 ### **Инфраструктура & DevOps**
 * 🐳 **Контейнеризация:** Docker, Docker Compose, autoheal
 * 🔨**Отказоустойчивость:** autoheal - автоматический перезапуск упавших контейнеров.
@@ -40,7 +41,7 @@ weather-chatbot
 ├─ packages
 │  ├─ cache
 │  │  ├─ base.py
-│  │  ├─ redis.py
+│  │  ├─ redis_cache.py
 │  │  └─ __init__.py
 │  ├─ core
 │  │  ├─ env.py
@@ -50,7 +51,7 @@ weather-chatbot
 │  │  ├─ postgres.py
 │  │  └─ __init__.py
 │  ├─ logging
-│  │  ├─ setup.py
+│  │  ├─ logger.py
 │  │  └─ __init__.py
 │  └─ redis
 │     └─ redis_client.py
@@ -95,7 +96,7 @@ weather-chatbot
 │  │  │  ├─ base.py
 │  │  │  └─ __init__.py
 │  │  ├─ routers
-│  │  │  ├─ weather.py
+│  │  │  ├─ weather_router.py
 │  │  │  └─ __init__.py
 │  │  ├─ services
 │  │  │  ├─ weather_service.py
@@ -113,10 +114,14 @@ weather-chatbot
 │  │  ├─ clients
 │  │  │  ├─ api.py
 │  │  │  └─ __init__.py
+│  │  ├─ models
+│  │  │  ├─ city_task.py
+│  │  │  └─ __init__.py
 │  │  ├─ services
-│  │  │  ├─ weather.py
+│  │  │  ├─ weather_service.py
 │  │  │  └─ __init__.py
 │  │  ├─ settings
+│  │  │  ├─ city_tasks.py
 │  │  │  └─ config.py
 │  │  └─ tasks
 │  │     ├─ weather_tasks.py

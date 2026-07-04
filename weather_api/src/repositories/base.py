@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
+
 class WeatherCache(ABC):
     @abstractmethod
     async def get_weather(self, city: str) -> dict[str, Any] | None:

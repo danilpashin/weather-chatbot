@@ -1,6 +1,7 @@
 import aiohttp
 from packages.logging import logger
 
+
 async def fetch_data(session: aiohttp.ClientSession, url):
     try:
         async with session.get(url) as response:
@@ -11,11 +12,11 @@ async def fetch_data(session: aiohttp.ClientSession, url):
                 return None
 
             payload = {
-                "temp": data["main"]["temp"], 
-                "feels_like": data["main"]["feels_like"], 
-                "weather_desc": data["weather"][0]["description"], 
+                "temp": data["main"]["temp"],
+                "feels_like": data["main"]["feels_like"],
+                "weather_desc": data["weather"][0]["description"],
                 "wind": data["wind"]["speed"],
-                "humidity": data["main"]["humidity"]
+                "humidity": data["main"]["humidity"],
             }
 
             return payload

@@ -1,6 +1,6 @@
-from packages.cache.redis import RedisCache
+from packages.cache.redis_cache import RedisCache
 from packages.core.env import init_env
-import os
+
 
 init_env()
 

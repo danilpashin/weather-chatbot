@@ -5,7 +5,9 @@ from packages.cache.base import Cache
 from packages.logging import logger
 from packages.core.env import init_env
 
+
 init_env()
+
 
 class RedisCache(Cache):
     def __init__(self):
@@ -14,7 +16,7 @@ class RedisCache(Cache):
         self.client = RedisConnManager().get_master()
 
     async def set(self, key, value, ex: int | None = None):
-        try:    
+        try:
             client = self.client
             if ex:
                 await client.set(key, value, ex=ex)
@@ -30,7 +32,7 @@ class RedisCache(Cache):
             if data is None or data == "":
                 logger.debug(f"Ключ '{key}' не найден или пуст!")
                 return None
-            
+
             return data
         except json.JSONDecodeError as e:
             logger.error(f"Ошибка парсинга в JSON при ключе '{key}': {e}")
@@ -38,7 +40,7 @@ class RedisCache(Cache):
         except Exception as e:
             logger.error(f"Ошибка при получении данных по ключу '{key}': {e}")
             return None
-    
+
     async def close(self):
         client = self.client
         if client is not None:

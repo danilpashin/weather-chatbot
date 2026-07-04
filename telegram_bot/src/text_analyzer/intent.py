@@ -3,6 +3,7 @@ import telegram_bot.src.text_analyzer.key_words as kw
 from telegram_bot.src.text_analyzer.analyzer import analyzer
 from telegram_bot.src.domain.parsed_data import ParsedData
 
+
 def parse_intent(message) -> ParsedData:
     is_weather_request = False
     city = None
@@ -20,7 +21,7 @@ def parse_intent(message) -> ParsedData:
                 if c.lower() == normal_form:
                     city = c
                     break
-                
+
             if city is None:
                 for c in kw.CITIES_SHORT.keys():
                     if c == normal_form:

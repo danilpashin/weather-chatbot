@@ -2,8 +2,10 @@ import asyncio
 from packages.logging import logger, listener
 from worker.src.tasks.weather_tasks import weather_worker
 
+
 async def main_worker():
     await weather_worker()
+
 
 if __name__ == "__main__":
     try:

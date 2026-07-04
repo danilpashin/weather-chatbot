@@ -6,7 +6,7 @@ from telegram_bot.src.settings.config import TOKEN
 from telegram_bot.src.context import context_types
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     application = ApplicationBuilder().token(TOKEN).context_types(context_types).build()
 
     application.bot_data["db"] = db
@@ -15,6 +15,6 @@ if __name__ == '__main__':
     from telegram_bot.src.handlers import get_handlers
 
     application.add_handlers(get_handlers())
-    
-    logger.info('МетеоБот запускается...')
+
+    logger.info("МетеоБот запускается...")
     application.run_polling()
