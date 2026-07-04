@@ -8,6 +8,7 @@ services:
     networks:
       redis-net:
         ipv4_address: 172.55.0.10
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -23,6 +24,12 @@ services:
     networks:
       redis-net:
         ipv4_address: 172.55.0.11
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
     depends_on:
       redis-master:
         condition: service_healthy
@@ -40,6 +47,7 @@ services:
              echo 'sentinel down-after-milliseconds mymaster 5000' >> sentinel.conf &&
              echo 'sentinel failover-timeout mymaster 10000' >> sentinel.conf &&
              redis-server sentinel.conf --sentinel"
+    restart: unless-stopped
     networks:
       - redis-net
     depends_on:
@@ -59,6 +67,7 @@ services:
              echo 'sentinel down-after-milliseconds mymaster 5000' >> sentinel.conf &&
              echo 'sentinel failover-timeout mymaster 10000' >> sentinel.conf &&
              redis-server sentinel.conf --sentinel"
+    restart: unless-stopped
     networks:
       - redis-net
     depends_on:
@@ -78,6 +87,7 @@ services:
              echo 'sentinel down-after-milliseconds mymaster 5000' >> sentinel.conf &&
              echo 'sentinel failover-timeout mymaster 10000' >> sentinel.conf &&
              redis-server sentinel.conf --sentinel"
+    restart: unless-stopped
     networks:
       - redis-net
     depends_on:
@@ -97,7 +107,7 @@ services:
       - API_PORT=${API_PORT}
       - REDIS_SENTINELS=${REDIS_SENTINELS}
       - REDIS_MASTER_NAME=${REDIS_MASTER_NAME}
-    restart: always
+    restart: unless-stopped
     networks:
       - redis-net
     depends_on:
@@ -123,6 +133,13 @@ services:
       - REDIS_MASTER_NAME=${REDIS_MASTER_NAME}
     networks:
       - redis-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://${API_HOST}:${API_PORT}/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     ports:
       - "${API_PORT}:${API_PORT}"
     depends_on:
@@ -143,7 +160,7 @@ services:
       - REDIS_MASTER_NAME=${REDIS_MASTER_NAME}
     networks:
       - redis-net
-    restart: always
+    restart: unless-stopped
     labels:
       - autoheal=true
     healthcheck:
@@ -184,7 +201,7 @@ services:
   autoheal:
     image: willfarrell/autoheal:latest
     container_name: autoheal-monitor
-    restart: always
+    restart: unless-stopped
     environment:
       - AUTOHEAL_CONTAINER_LABEL=autoheal
       - AUTOHEAL_INTERVAL=5
@@ -197,6 +214,7 @@ services:
     ports:
       - "3100:3100"
     command: -config.file=/etc/loki/local-config.yaml
+    restart: unless-stopped
 
   promtail:
     image: grafana/promtail:latest
@@ -205,6 +223,7 @@ services:
       - app-logs:/var/log/app
       - ./promtail-config.yaml:/etc/promtail/config.yaml
     command: -config.file=/etc/promtail/config.yaml
+    restart: unless-stopped
     depends_on:
       - loki
 
@@ -216,6 +235,7 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+    restart: unless-stopped
     depends_on:
       - loki
 
