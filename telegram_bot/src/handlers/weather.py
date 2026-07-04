@@ -33,7 +33,7 @@ async def weather_all(update: Update, context: CustomContext):
                     logger.error(f"❌ Ошибка API {response.status}: {error_text}")
                     await context.bot.send_message(
                         chat_id=update.effective_chat.id,
-                        text=f"❌ Ошибка API: {response.status}. Подробности в логах.",
+                        text="❌ Ошибка сервера, попробуйте ещё раз позже!",
                     )
                     return None
 
