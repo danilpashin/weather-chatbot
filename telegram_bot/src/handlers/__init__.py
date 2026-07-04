@@ -1,8 +1,12 @@
-from telegram_bot.src.handlers import (start, weather, city, unknown)
+def get_handlers():
+    from telegram_bot.src.handlers import (start, help, weather, city, unknown)
 
-handlers = [
-    start.start_handler, 
-    weather.weather_handler, 
-    city.change_city_conv,
-    unknown.unknown_handler
-]
+    handlers = (
+        start.create_start_handler(),
+        help.create_help_handler(),
+        weather.create_weather_handler(),
+        city.create_city_handler(),
+        unknown.create_unknown_handler()
+    )
+
+    return handlers

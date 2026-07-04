@@ -1,19 +1,19 @@
 import aiohttp
 import telegram_bot.src.settings.config as cfg
 
-from uuid import uuid4
 from telegram import Update
-from telegram.ext import ContextTypes, MessageHandler, filters
+from telegram.ext import MessageHandler, filters
 from telegram_bot.src.handlers.menu import menu
+from telegram_bot.src.context import CustomContext
 from packages.logging import logger
-from packages.logging.setup import trace_id_var, user_id_var
+from packages.logging.logger import trace_id_var, user_id_var
 
 
-async def weather_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    current_city = await context.bot_data.cache.get(update.message.from_user.id)
+async def weather_all(update: Update, context: CustomContext):
+    current_city = await context.cache.get(update.message.from_user.id)
     if current_city is None:
-        current_city = await context.bot_data.db.get_user_data(update.message.from_user.id)
-        await context.bot_data.cache.set(update.message.from_user.id, current_city, 300)
+        current_city = await context.db.get_user_data(update.message.from_user.id)
+        await context.cache.set(update.message.from_user.id, current_city, 300)
         
     current_url = f"{cfg.URL}?name={current_city}"
 
@@ -58,4 +58,5 @@ async def weather_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await menu(update, context)
 
 
-weather_handler = MessageHandler(filters.Text("Погода"), weather_all)
+def create_weather_handler():
+    return MessageHandler(filters.Text("Погода"), weather_all)

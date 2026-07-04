@@ -1,8 +1,8 @@
 from telegram import Update, ReplyKeyboardMarkup
-from telegram.ext import ContextTypes
+from telegram_bot.src.context import CustomContext
 
 
-async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE, text="Выберите команду"):
+async def menu(update: Update, context: CustomContext, text="Выберите команду"):
     reply_keyboard = [["Погода", "Сменить город"]]
     await update.message.reply_text(
         text,
