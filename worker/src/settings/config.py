@@ -6,4 +6,4 @@ init_env()
 
 API_TOKEN = os.getenv("API_TOKEN")
 
-DEFAULT_INTERVAL = int(os.getenv("INTERVAL_SECONDS", 3600))
+DEFAULT_INTERVAL = int(os.getenv("INTERVAL_SECONDS", 60))
