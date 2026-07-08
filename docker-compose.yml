@@ -115,6 +115,34 @@ services:
     volumes:
       - app-logs:/app/logs
 
+  notifications-scheduler:
+    container_name: notifications-scheduler
+    build: .
+    command: python -m telegram_bot.tasks.rq_scheduler
+    networks:
+      - redis-net
+    environment:
+      - SERVICE_NAME=notify-scheduler
+    env_file:
+      - .env
+    restart: unless-stopped
+    volumes:
+      - app-logs:/app/logs
+
+  worker-notifier:
+    container_name: worker-notifier
+    build: .
+    command: python -m telegram_bot.tasks.rq_worker
+    networks:
+      - redis-net
+    environment:
+      - SERVICE_NAME=worker-notifier
+    env_file:
+      - .env
+    restart: unless-stopped
+    volumes:
+      - app-logs:/app/logs
+
   weather-api:
     container_name: weather-api
     build: .
