@@ -1,6 +1,6 @@
 import json
 from typing import Any
-from packages.redis.redis_client import RedisConnManager
+from packages.redis.redis_client import AsyncRedisConnManager
 from packages.cache.base import Cache
 from packages.logging import logger
 from packages.core.env import init_env
@@ -13,7 +13,7 @@ class RedisCache(Cache):
     def __init__(self):
         self._client = None
         self._decode_responses = True
-        self.client = RedisConnManager().get_master()
+        self.client = AsyncRedisConnManager().get_master()
 
     async def set(self, key, value, ex: int | None = None):
         try:
