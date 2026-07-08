@@ -23,7 +23,12 @@ def upgrade() -> None:
     op.create_table(
         "users",
         sa.Column("id", sa.BigInteger, primary_key=True),
+        sa.Column("chat_id", sa.BigInteger, unique=True, nullable=True),
         sa.Column("city", sa.String, server_default="Москва", nullable=False),
+        sa.Column("timezone", sa.SmallInteger, server_default=sa.text("3")),
+        sa.Column("notification_status", sa.Boolean, server_default=sa.false()),
+        sa.Column("local_time", sa.String, server_default="09:00"),
+        sa.Column("utc_minutes", sa.Integer, server_default=sa.text("540")),
     )
 
 
