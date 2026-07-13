@@ -16,7 +16,8 @@
 ### **Базы данных & Производительность**
 * 🐘 **База данных:** PostgreSQL (v16-alpine)
 * 🗃️ **Кеш:** Redis Sentinel
-* 🧱 **Лимитер:** FastAPI-limiter (v0.2.0)
+* 🧱 **Лимитер API:** FastAPI-limiter (v0.2.0)
+* 🛑 **Лимитер бота:** pyrate-limiter (v4.4.0)
 ### **Сервисы & Инструменты**
 * 🌤️ **Погодный API:** OpenWeatherMap API
 * 📓 **Морфологический анализатор:** mawo-pymorphy3 (v1.0.4) - анализ текста для бота.
@@ -30,14 +31,23 @@
 
 ```
 weather-chatbot
+├─ .dockerignore
 ├─ docker-compose.yml
-├─ Dockerfile.bot
-├─ Dockerfile.weather-api
-├─ Dockerfile.worker
+├─ Dockerfile
+├─ promtail-config.yaml
+├─ README.md
+├─ requirements.txt
 ├─ docs
 │  └─ images
 │     ├─ bot_demo_1.png
-│     └─ bot_demo_2.png
+│     ├─ bot_demo_2.png
+│     ├─ bot_demo_3.png
+│     ├─ bot_demo_4.png
+│     ├─ bot_demo_5.png
+│     ├─ grafana_1.png
+│     ├─ grafana_2.png
+│     ├─ grafana_3.png
+│     └─ grafana_4.png
 ├─ packages
 │  ├─ cache
 │  │  ├─ base.py
@@ -66,25 +76,37 @@ weather-chatbot
 │  ├─ alembic.ini
 │  ├─ main.py
 │  ├─ src
+│  │  ├─ context.py
 │  │  ├─ domain
 │  │  │  └─ parsed_data.py
 │  │  ├─ handlers
 │  │  │  ├─ city.py
 │  │  │  ├─ help.py
-│  │  │  ├─ menu.py
+│  │  │  ├─ notifications.py
+│  │  │  ├─ settings.py
+│  │  │  ├─ settings_states.py
 │  │  │  ├─ start.py
 │  │  │  ├─ unknown.py
 │  │  │  ├─ weather.py
 │  │  │  └─ __init__.py
 │  │  ├─ services
+│  │  │  ├─ location.py
+│  │  │  ├─ user_limiter.py
 │  │  │  └─ user_service.py
 │  │  ├─ settings
 │  │  │  └─ config.py
-│  │  └─ text_analyzer
-│  │     ├─ analyzer.py
-│  │     ├─ intent.py
-│  │     ├─ key_words.py
-│  │     └─ __init__.py
+│  │  ├─ text_analyzer
+│  │  │  ├─ analyzer.py
+│  │  │  ├─ intent.py
+│  │  │  ├─ key_words.py
+│  │  │  └─ __init__.py
+│  │  └─ utils
+│  │     └─ telegram_helpers.py
+│  ├─ tasks
+│  │  ├─ rq_scheduler.py
+│  │  ├─ rq_worker.py
+│  │  ├─ weather_tasks.py
+│  │  └─ __init__.py
 │  └─ __init__.py
 ├─ weather_api
 │  ├─ main.py
@@ -108,30 +130,25 @@ weather-chatbot
 │  │  ├─ test_weather.py
 │  │  └─ __init__.py
 │  └─ __init__.py
-├─ worker
-│  ├─ main.py
-│  ├─ src
-│  │  ├─ clients
-│  │  │  ├─ api.py
-│  │  │  └─ __init__.py
-│  │  ├─ models
-│  │  │  ├─ city_task.py
-│  │  │  └─ __init__.py
-│  │  ├─ services
-│  │  │  ├─ weather_service.py
-│  │  │  └─ __init__.py
-│  │  ├─ settings
-│  │  │  ├─ city_tasks.py
-│  │  │  └─ config.py
-│  │  └─ tasks
-│  │     ├─ weather_tasks.py
-│  │     └─ __init__.py
-│  └─ __init__.py
-├─ promtail-config.yaml
-├─ README.md
-├─ requirements.txt
-├─ .env
-├─ .gitignore
+└─ worker
+   ├─ main.py
+   ├─ src
+   │  ├─ clients
+   │  │  ├─ api.py
+   │  │  └─ __init__.py
+   │  ├─ models
+   │  │  ├─ city_task.py
+   │  │  └─ __init__.py
+   │  ├─ services
+   │  │  ├─ weather_service.py
+   │  │  └─ __init__.py
+   │  ├─ settings
+   │  │  ├─ city_tasks.py
+   │  │  └─ config.py
+   │  └─ tasks
+   │     ├─ weather_tasks.py
+   │     └─ __init__.py
+   └─ __init__.py
 
 ```
 
@@ -161,7 +178,7 @@ pip install -r requirements.txt
 
 ### 4. Запуск контейнеров
 ```bash
-docker compose -f docker-compose.yml up
+docker compose up
 ```
 
 ### 5. Использование бота
@@ -172,3 +189,13 @@ docker compose -f docker-compose.yml up
 
 ![Демо бота 1](docs/images/bot_demo_1.png)
 ![Демо бота 2](docs/images/bot_demo_2.png)
+![Демо бота 3](docs/images/bot_demo_3.png)
+![Демо бота 4](docs/images/bot_demo_4.png)
+![Демо бота 5](docs/images/bot_demo_5.png)
+
+## Логи в Grafana
+
+![Grafana 1](docs/images/grafana_1.png)
+![Grafana 2](docs/images/grafana_2.png)
+![Grafana 3](docs/images/grafana_3.png)
+![Grafana 4](docs/images/grafana_4.png)
