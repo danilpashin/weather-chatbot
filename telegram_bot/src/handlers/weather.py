@@ -8,9 +8,10 @@ from telegram_bot.src.context import CustomContext
 from telegram_bot.src.services.user_limiter import rate_limit
 from packages.logging import logger
 from packages.logging.logger import trace_id_var, user_id_var
+from telegram_bot.src.services.user_limiter import limiter
 
 
-@rate_limit(limit_seconds=2)
+@limiter.as_decorator(name=lambda **kwargs: kwargs.get('user_id'))
 async def weather_all(update: Update, context: CustomContext):
     current_city = await context.cache.get(update.effective_user.id)
     if current_city is None:

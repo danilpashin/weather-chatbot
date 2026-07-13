@@ -3,10 +3,10 @@ from telegram.ext import MessageHandler, filters
 from telegram_bot.src.context import CustomContext
 from telegram_bot.src.services.user_limiter import rate_limit
 from telegram_bot.src.text_analyzer.intent import parse_intent
-from telegram_bot.src.handlers.weather import weather_all
+from telegram_bot.src.services.user_limiter import limiter
 
 
-@rate_limit(limit_seconds=0.5)
+@limiter.as_decorator(name=lambda **kwargs: kwargs.get('user_id'))
 async def unknown(update: Update, context: CustomContext):
     data = parse_intent(update.message.text)
     if data.is_weather_request:

@@ -1,8 +1,10 @@
 from telegram import Update
 from telegram.ext import CommandHandler
 from telegram_bot.src.context import CustomContext
+from telegram_bot.src.services.user_limiter import limiter
 
 
+@limiter.as_decorator(name=lambda **kwargs: kwargs.get('user_id'))
 async def help(update: Update, context: CustomContext):
     help_text = (
         "⚒️ <b>Список команд</b>:\n\n"

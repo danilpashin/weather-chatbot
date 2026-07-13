@@ -4,9 +4,10 @@ from telegram.ext import CommandHandler
 from telegram_bot.src.context import CustomContext
 from telegram_bot.src.services.user_limiter import rate_limit
 from packages.logging.logger import trace_id_var, user_id_var
+from telegram_bot.src.services.user_limiter import limiter
 
 
-@rate_limit(limit_seconds=1)
+@limiter.as_decorator(name=lambda **kwargs: kwargs.get('user_id'))
 async def start(update: Update, context: CustomContext):
     user_id = update.message.from_user.id
     trace_id = str(uuid4())

@@ -25,11 +25,10 @@ from telegram_bot.src.handlers.settings_states import (
     SETTING_NOTIFICATION_TIME,
     SETTING_TIME_ZONE,
 )
-from telegram_bot.src.context import CustomContext
-from telegram_bot.src.services.user_limiter import rate_limit
+from telegram_bot.src.services.user_limiter import limiter
 
 
-@rate_limit(limit_seconds=1.0)
+@limiter.as_decorator(name=lambda **kwargs: kwargs.get('user_id'))
 async def start_settings(update: Update, context: CustomContext) -> int:
     keyboard = [
         [InlineKeyboardButton("🏙️ Сменить город", callback_data="menu_change_city")],
