@@ -1,10 +1,17 @@
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import (
-    filters,
-    MessageHandler,
-    ConversationHandler,
-    CommandHandler,
     CallbackQueryHandler,
+    CommandHandler,
+    ConversationHandler,
+    MessageHandler,
+    filters,
+)
+
+from telegram_bot.src.context import CustomContext
+from telegram_bot.src.handlers.city import (
+    confirm_change_city,
+    save_new_city,
+    start_change_city,
 )
 from telegram_bot.src.handlers.notifications import (
     create_notifications_handlers,
@@ -12,23 +19,18 @@ from telegram_bot.src.handlers.notifications import (
     set_timezone_save,
     show_notifications_menu,
 )
-from telegram_bot.src.handlers.city import (
-    start_change_city,
-    confirm_change_city,
-    save_new_city,
-)
 from telegram_bot.src.handlers.settings_states import (
-    SELECTING_SETTING,
     CHANGING_CITY,
-    SAVE_CITY,
     NOTIFICATIONS_SETTING,
+    SAVE_CITY,
+    SELECTING_SETTING,
     SETTING_NOTIFICATION_TIME,
     SETTING_TIME_ZONE,
 )
 from telegram_bot.src.services.user_limiter import limiter
 
 
-@limiter.as_decorator(name=lambda **kwargs: kwargs.get('user_id'))
+@limiter.as_decorator(name=lambda **kwargs: kwargs.get("user_id"))
 async def start_settings(update: Update, context: CustomContext) -> int:
     keyboard = [
         [InlineKeyboardButton("🏙️ Сменить город", callback_data="menu_change_city")],

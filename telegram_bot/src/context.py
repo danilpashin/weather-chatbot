@@ -1,7 +1,7 @@
+from telegram.ext import CallbackContext, ContextTypes, ExtBot
+
 from packages.cache.base import Cache
 from packages.db.base import Database
-from telegram.ext import CallbackContext, ExtBot
-from telegram.ext import ContextTypes
 
 
 class CustomContext(CallbackContext[ExtBot, dict, dict, dict]):

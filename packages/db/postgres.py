@@ -1,10 +1,11 @@
 import os
 from typing import Any
+
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine
-from packages.db.base import Database
-from packages.core.env import init_env
 
+from packages.core.env import init_env
+from packages.db.base import Database
 
 init_env()
 
@@ -40,16 +41,18 @@ class PostgresDB(Database):
             data = result.fetchone()
             if data is None:
                 await conn.execute(
-                    text(
-                        "INSERT INTO users (id, city, timezone) VALUES (:id, :city, :timezone)"
-                    ),
+                    text("""
+                        INSERT INTO users (id, city, timezone) 
+                        VALUES (:id, :city, :timezone)
+                    """),
                     {"id": user_id, "city": city, "timezone": tz},
                 )
             elif data[0] != city:
                 await conn.execute(
-                    text(
-                        "UPDATE users SET city = :city, timezone = :timezone WHERE id = :id"
-                    ),
+                    text("""
+                        UPDATE users SET city = :city, timezone = :timezone
+                        WHERE id = :id
+                    """),
                     {"id": user_id, "city": city, "timezone": tz},
                 )
             return None

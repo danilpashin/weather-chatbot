@@ -1,5 +1,5 @@
 def get_handlers():
-    from telegram_bot.src.handlers import start, help, weather, settings, unknown
+    from telegram_bot.src.handlers import help, settings, start, unknown, weather
 
     handlers = (
         start.create_start_handler(),

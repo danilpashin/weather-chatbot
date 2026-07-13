@@ -1,9 +1,11 @@
 import os
+
 import pytest
 
 os.environ["REDIS_URL"] = "memory://"
 
 from httpx import ASGITransport, AsyncClient
+
 from weather_api.main import factory
 
 

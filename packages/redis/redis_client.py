@@ -1,8 +1,9 @@
 import os
-from packages.core.env import init_env
+
 from redis.asyncio.sentinel import Sentinel as AsyncSentinel
 from redis.sentinel import Sentinel as SyncSentinel
 
+from packages.core.env import init_env
 
 init_env()
 

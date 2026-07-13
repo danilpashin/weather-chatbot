@@ -1,10 +1,10 @@
-import telegram_bot.src.settings.config as cfg
-
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ConversationHandler
-from telegram_bot.src.services.location import get_city_timezone
+
+import telegram_bot.src.settings.config as cfg
 from telegram_bot.src.context import CustomContext
 from telegram_bot.src.handlers.settings_states import CHANGING_CITY, SAVE_CITY
+from telegram_bot.src.services.location import get_city_timezone
 
 
 async def start_change_city(update: Update, context: CustomContext) -> int:
@@ -63,11 +63,16 @@ async def save_new_city(update: Update, context: CustomContext) -> int:
     else:
         timezone = await get_city_timezone(current_city)
 
-        await context.cache.set(user_id, current_city)
+        await context.cache.set(user_id, current_city, 300)
         await context.db.set_user_data(user_id, current_city, timezone)
 
+        reply_text = (
+            f"✨<b>Отлично, город сменён!</b>✨ "
+            f"🌃 <i>Текущий город:</i> <b>{current_city}</b>"
+        )
+
         await update.callback_query.edit_message_text(
-            text=f"✨<b>Отлично, город сменён!</b>✨ 🌃 <i>Текущий город:</i> <b>{current_city}</b>\n\n",
+            text=reply_text,
             parse_mode="HTML",
         )
 

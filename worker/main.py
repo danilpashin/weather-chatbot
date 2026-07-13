@@ -1,5 +1,6 @@
 import asyncio
-from packages.logging import logger, listener
+
+from packages.logging import listener, logger
 from worker.src.tasks.weather_tasks import weather_worker
 
 

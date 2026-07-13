@@ -1,10 +1,10 @@
 import json
 from typing import Any
-from packages.redis.redis_client import AsyncRedisConnManager
-from packages.cache.base import Cache
-from packages.logging import logger
-from packages.core.env import init_env
 
+from packages.cache.base import Cache
+from packages.core.env import init_env
+from packages.logging import logger
+from packages.redis.redis_client import AsyncRedisConnManager
 
 init_env()
 
@@ -24,6 +24,21 @@ class RedisCache(Cache):
                 await client.set(key, value)
         except Exception as e:
             logger.error(f"Ошибка при записи данных: {e}")
+
+    async def hset_user(self, user_id: int, **kwargs):
+        try:
+            client = self.client
+            await client.hset(f"user:{user_id}", mapping=kwargs)
+            await client.hexpire(f"user:{user_id}", 300)
+        except Exception as e:
+            logger.error(f"Ошибка при записи данных: {e}")
+
+    async def hget_user(self, user_id: int, field: str):
+        try:
+            client = self.client
+            await client.hget(f"user:{user_id}", field)
+        except Exception as e:
+            logger.error(f"Ошибка при получении данных: {e}")
 
     async def get(self, key) -> Any | None:
         try:

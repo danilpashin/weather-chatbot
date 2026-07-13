@@ -1,13 +1,14 @@
-from telegram.ext import ApplicationBuilder
-from telegram import Bot
-from telegram_bot.src.settings.config import TOKEN
-from packages.logging import logger
-from packages.db import db
-from packages.cache import cache
-from aiolimiter import AsyncLimiter
-import datetime
 import asyncio
+import datetime
 import json
+
+from aiolimiter import AsyncLimiter
+from telegram import Bot
+
+from packages.cache import cache
+from packages.db import db
+from packages.logging import logger
+from telegram_bot.src.settings.config import TOKEN
 
 rate_limiter = AsyncLimiter(max_rate=25, time_period=1.0)
 
@@ -41,10 +42,14 @@ async def send_notifications(users: list[dict]):
                         "✨<b>Уведомление</b>✨\n"
                         f"🌍<b>Погода в городе {user_city}</b>\n"
                         "\n"
-                        f"🌡 <i>Текущая температура:</i> <b><code>{temp}°C</code></b>\n"
-                        f"🤔 <i>По ощущениям как:</i> <b><code>{feels_like}°C</code></b>\n"
-                        f"💨 <i>Скорость ветра:</i> <b><code>{wind}м/с</code></b>\n"
-                        f"☁️ <i>За окном сейчас:</i> <b><code>{weather_desc}</code></b>\n\n"
+                        f"🌡 <i>Текущая температура:</i> "
+                        f"<b><code>{temp}°C</code></b>\n"
+                        f"🤔 <i>По ощущениям как:</i> "
+                        f"<b><code>{feels_like}°C</code></b>\n"
+                        f"💨 <i>Скорость ветра:</i> "
+                        f"<b><code>{wind}м/с</code></b>\n"
+                        f"☁️ <i>За окном сейчас:</i> "
+                        f"<b><code>{weather_desc}</code></b>\n\n"
                         "─────────────────────\n"
                         "✨ <i>Хорошего дня и отличного настроения!</i> ☀️"
                         "📌 Для настройки подписок используйте меню ниже."
@@ -55,7 +60,7 @@ async def send_notifications(users: list[dict]):
                         text=weather_text,
                         parse_mode="HTML",
                     )
-                except Exception as e:
+                except Exception:
                     logger.error(
                         f"Ошибке при отправке уведомлений для города {user['city']} в "
                     )

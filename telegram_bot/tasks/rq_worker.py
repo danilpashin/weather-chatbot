@@ -1,7 +1,7 @@
-from packages.redis.redis_client import RedisConnManager
-from packages.logging import logger
-from rq import Worker, Queue
+from rq import Queue, Worker
 
+from packages.logging import logger
+from packages.redis.redis_client import RedisConnManager
 
 master = RedisConnManager(decode_responses=False).get_master()
 

@@ -1,13 +1,14 @@
 from uuid import uuid4
-from telegram import Update, ReplyKeyboardMarkup
+
+from telegram import ReplyKeyboardMarkup, Update
 from telegram.ext import CommandHandler
-from telegram_bot.src.context import CustomContext
-from telegram_bot.src.services.user_limiter import rate_limit
+
 from packages.logging.logger import trace_id_var, user_id_var
+from telegram_bot.src.context import CustomContext
 from telegram_bot.src.services.user_limiter import limiter
 
 
-@limiter.as_decorator(name=lambda **kwargs: kwargs.get('user_id'))
+@limiter.as_decorator(name=lambda **kwargs: kwargs.get("user_id"))
 async def start(update: Update, context: CustomContext):
     user_id = update.message.from_user.id
     trace_id = str(uuid4())
@@ -30,7 +31,8 @@ async def start(update: Update, context: CustomContext):
 
 async def menu(update: Update):
     welcome_text = (
-        "Привет! Меня зовут ☁️<b>МетеоБот</b>☁️. У меня ты можешь узнать погоду в своем городе!\n\n"
+        "Привет! Меня зовут ☁️<b>МетеоБот</b>☁️. У меня ты можешь "
+        "узнать погоду в своем городе!\n\n"
         "<i>Отправь <b><code>/help</code></b>, чтобы просмотреть доступные команды.</i>"
     )
 

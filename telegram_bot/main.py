@@ -1,12 +1,13 @@
 import asyncio
+
 from telegram.ext import ApplicationBuilder
 
 from packages.cache import cache
 from packages.db import db
 from packages.logging import logger
 from telegram_bot.src.context import context_types
-from telegram_bot.src.settings.config import TOKEN
 from telegram_bot.src.services.user_limiter import init_limiter
+from telegram_bot.src.settings.config import TOKEN
 
 
 async def main():
@@ -33,6 +34,7 @@ async def main():
         await application.updater.stop()
         await application.stop()
         await application.shutdown()
+
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -1,12 +1,12 @@
-import queue
+import json
 import logging
 import os
-import json
-from pathlib import Path
-from packages.core.env import init_env
-from logging.handlers import QueueHandler, QueueListener
+import queue
 from contextvars import ContextVar
+from logging.handlers import QueueHandler, QueueListener
+from pathlib import Path
 
+from packages.core.env import init_env
 
 init_env()
 
@@ -40,7 +40,8 @@ class JsonFormatter(logging.Formatter):
 
 def setup_logging() -> QueueListener:
     text_formatter = logging.Formatter(
-        "%(asctime)s [%(levelname)s] [%(service)s] [Trace:%(trace_id)s] [User:%(user_id)s] %(message)s"
+        "%(asctime)s [%(levelname)s] [%(service)s] "
+        "[Trace:%(trace_id)s] [User:%(user_id)s] %(message)s"
     )
 
     log_dir = Path(os.getenv("LOG_DIR", "/app/logs"))

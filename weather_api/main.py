@@ -1,17 +1,17 @@
 import asyncio
-import uvicorn
+from typing import Awaitable, Callable
 from uuid import uuid4
-from weather_api.src.routers.weather_router import router
+
+import uvicorn
 from fastapi import FastAPI, Request, Response
 from fastapi.routing import _IncludedRouter
-from typing import Callable, Awaitable
-from weather_api.src.routers.weather_router import get_weather_service
+
+from packages.cache import cache
+from packages.logging import listener, logger
+from packages.logging.logger import trace_id_var, user_id_var
+from weather_api.src.routers.weather_router import get_weather_service, router
 from weather_api.src.services.weather_service import WeatherService
 from weather_api.src.settings import config as cfg
-from packages.logging import logger, listener
-from packages.cache import cache
-from packages.logging.logger import trace_id_var, user_id_var
-
 
 if not hasattr(_IncludedRouter, "path"):
     _IncludedRouter.path = property(lambda self: "")

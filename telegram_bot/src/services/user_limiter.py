@@ -1,7 +1,9 @@
-from pyrate_limiter import Limiter, RedisBucket, Rate, Duration
+from pyrate_limiter import Duration, Limiter, Rate, RedisBucket
+
 from packages.redis.redis_client import AsyncRedisConnManager as AsyncRedis
 
 limiter = None
+
 
 async def init_limiter():
     global limiter

@@ -1,8 +1,8 @@
-from telegram_bot.tasks.weather_tasks import check_and_send_notifications
-from packages.redis.redis_client import RedisConnManager
-from packages.logging import logger
 from rq.cron import CronScheduler
 
+from packages.logging import logger
+from packages.redis.redis_client import RedisConnManager
+from telegram_bot.tasks.weather_tasks import check_and_send_notifications
 
 master = RedisConnManager(decode_responses=False).get_master()
 

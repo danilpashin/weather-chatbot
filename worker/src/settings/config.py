@@ -1,6 +1,6 @@
 import os
-from packages.core.env import init_env
 
+from packages.core.env import init_env
 
 init_env()
 

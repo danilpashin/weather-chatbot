@@ -1,17 +1,16 @@
 import aiohttp
-import telegram_bot.src.settings.config as cfg
-
 from telegram import Update
 from telegram.ext import MessageHandler, filters
-from telegram_bot.src.utils.telegram_helpers import clear_active_inline_menu
-from telegram_bot.src.context import CustomContext
-from telegram_bot.src.services.user_limiter import rate_limit
+
+import telegram_bot.src.settings.config as cfg
 from packages.logging import logger
 from packages.logging.logger import trace_id_var, user_id_var
+from telegram_bot.src.context import CustomContext
 from telegram_bot.src.services.user_limiter import limiter
+from telegram_bot.src.utils.telegram_helpers import clear_active_inline_menu
 
 
-@limiter.as_decorator(name=lambda **kwargs: kwargs.get('user_id'))
+@limiter.as_decorator(name=lambda **kwargs: kwargs.get("user_id"))
 async def weather_all(update: Update, context: CustomContext):
     current_city = await context.cache.get(update.effective_user.id)
     if current_city is None:
@@ -48,10 +47,14 @@ async def weather_all(update: Update, context: CustomContext):
                 weather_text = (
                     f"🌍<b>Погода в городе {current_city}</b>\n"
                     "\n"
-                    f"🌡 <i>Текущая температура:</i> <b><code>{data['temp']}°C</code></b>\n"
-                    f"🤔 <i>По ощущениям как:</i> <b><code>{data['feels_like']}°C</code></b>\n"
-                    f"💨 <i>Скорость ветра:</i> <b><code>{data['wind']}м/с</code></b>\n"
-                    f"☁️ <i>За окном сейчас:</i> <b>{data['weather_desc']}</b>\n\n"
+                    f"🌡 <i>Текущая температура:</i> "
+                    f"<b><code>{data['temp']}°C</code></b>\n"
+                    f"🤔 <i>По ощущениям как:</i> "
+                    f"<b><code>{data['feels_like']}°C</code></b>\n"
+                    f"💨 <i>Скорость ветра:</i> "
+                    f"<b><code>{data['wind']}м/с</code></b>\n"
+                    f"☁️ <i>За окном сейчас:</i> "
+                    f"<b>{data['weather_desc']}</b>\n\n"
                     f"─────────────────────\n"
                     f"✨ <i>Хорошего дня и отличного настроения!</i> ☀️"
                 )

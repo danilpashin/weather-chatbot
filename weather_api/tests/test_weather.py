@@ -1,5 +1,7 @@
-import pytest
 from unittest.mock import AsyncMock, patch
+
+import pytest
+
 from weather_api.src.domain.data import Data
 from weather_api.src.domain.exceptions import CityNotFoundError
 

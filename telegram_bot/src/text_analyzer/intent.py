@@ -1,7 +1,8 @@
 import string
+
 import telegram_bot.src.text_analyzer.key_words as kw
-from telegram_bot.src.text_analyzer.analyzer import analyzer
 from telegram_bot.src.domain.parsed_data import ParsedData
+from telegram_bot.src.text_analyzer.analyzer import analyzer
 
 
 def parse_intent(message) -> ParsedData:

@@ -1,11 +1,12 @@
-import aiohttp
 import asyncio
 import time
-from worker.src.services.weather_service import process_city_weather
-from worker.src.settings.config import DEFAULT_INTERVAL
-from worker.src.settings.city_tasks import CITY_TASKS
-from packages.logging import logger
 
+import aiohttp
+
+from packages.logging import logger
+from worker.src.services.weather_service import process_city_weather
+from worker.src.settings.city_tasks import CITY_TASKS
+from worker.src.settings.config import DEFAULT_INTERVAL
 
 HEALTH_FILE = "/tmp/worker_status/health.txt"
 

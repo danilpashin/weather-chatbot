@@ -1,6 +1,8 @@
 import datetime
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import CallbackQueryHandler
+
 from telegram_bot.src.context import CustomContext
 from telegram_bot.src.handlers.settings_states import (
     NOTIFICATIONS_SETTING,
@@ -22,7 +24,7 @@ async def show_notifications_menu(update: Update, context: CustomContext) -> int
     keyboard = [
         [
             InlineKeyboardButton(
-                f"✅ Включено" if notification_enabled else "❌ Выключено",
+                "✅ Включено" if notification_enabled else "❌ Выключено",
                 callback_data="toggle_notifications",
             )
         ],
@@ -43,7 +45,8 @@ async def show_notifications_menu(update: Update, context: CustomContext) -> int
         f"🌤️ Текущая погода: {'Доступна' if weather_data else 'Не определена'}\n"
         f"📅 Включены уведомления: {'Да' if notification_enabled else 'Нет'}\n"
         f"⏰ Время: {notification_time}\n"
-        f"🌍 Часовой пояс: {f'UTC+{time_zone}' if time_zone > 0 else f'UTC-{time_zone}'}\n"
+        f"🌍 Часовой пояс: "
+        f"{f'UTC+{time_zone}' if time_zone > 0 else f'UTC-{time_zone}'}\n"
     )
 
     query = update.callback_query
